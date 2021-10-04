@@ -7,6 +7,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// define a struct for car
+type Car struct {
+	Car_id int    `json:"Car_id"`
+	RegNum string `json:"RegNum"`
+	Colour string `json:"Colour"`
+}
+
 func main() {
 	fmt.Println("Go Mysql tutorial")
 
@@ -20,13 +27,20 @@ func main() {
 
 	fmt.Println("Successfully connected to MYSQL database")
 
-	insert, err := db.Query("INSERT INTO cars(RegNum,Colour) VALUES ('MH-14-3456', 'Red')")
+	results, err := db.Query("SELECT * FROM cars")
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	defer insert.Close()
+	for results.Next() {
+		var car Car
 
-	fmt.Println("Successfully inserted data into cars table")
+		err = results.Scan(&car.Car_id, &car.RegNum, &car.Colour)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		fmt.Println(car.Car_id, car.RegNum, car.Colour)
+	}
 }
